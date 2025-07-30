@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인터랙티브 홋카이도 가족 여행 플래너</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: A daily dashboard SPA. A top navigation bar allows users to switch between days (Day 1-4) and a "Trip Essentials" section. Each day is presented as a vertical timeline of interactive cards. Clicking a card reveals details like map codes or notes. The "Essentials" section includes a budget visualization chart and a quick-reference contact list. This structure prioritizes quick, on-the-go access to relevant information for a specific day, which is more user-friendly for a travel itinerary than a linear document. -->
+    <!-- Visualization & Content Choices:
+        - Itinerary Timeline (Report Chapters 2-5): Goal: Show daily flow. Method: Interactive cards in a vertical timeline (HTML/Tailwind/JS). Interaction: Click to expand for details. Justification: Breaks down dense text into manageable, sequential steps.
+        - Budget Breakdown (Report Table 3): Goal: Compare expense categories. Method: Chart.js Donut Chart. Interaction: Hover to see details. Justification: Provides a quick visual summary of spending.
+        - Key Contacts (Report Table 2): Goal: Quick access to navigation/contact info. Method: HTML table. Interaction: "Copy Mapcode" button. Justification: Highly practical for in-car navigation.
+        - Pre-trip Prep (Report Chapter 1): Goal: Task tracking. Method: HTML checklist. Justification: Simple and effective for ensuring readiness.
+        - Split Plan (Day 3): Goal: Show a group choice. Method: Tabbed content within a card for Pokemon Center vs. free time. Interaction: Click to switch views. Justification: Neatly organizes parallel activities for a large group.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #F8F5F2;
+            color: #4A4A4A;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #588B8B;
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+        .nav-button:not(.active):hover {
+            background-color: #C8AD_B0;
+            color: #FFFFFF;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 1.25rem;
+            top: 1.25rem;
+            bottom: -1.25rem;
+            width: 2px;
+            background-color: #C8AD_B0;
+            transform: translateX(-50%);
+        }
+        .timeline-item:last-child::before {
+            display: none;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: 1.25rem;
+            top: 1.25rem;
+            height: 1rem;
+            width: 1rem;
+            background-color: #588B8B;
+            border-radius: 9999px;
+            transform: translateX(-50%);
+            border: 2px solid #F8F5F2;
+        }
+        .details-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .details-content.open {
+            max-height: 500px;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        .alt-tab.active {
+            border-bottom: 2px solid #588B8B;
+            color: #588B8B;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+<div class="container mx-auto p-4 md:p-8 max-w-4xl">
+
+    <header class="text-center mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-[#588B8B]">준겸이네 홋카이도 여행 계획</h1>
+        <p class="mt-2 text-lg">후라노의 자연부터 삿포로의 활기까지, 3박 4일간의 여정</p>
+    </header>
+
+    <nav class="flex flex-wrap justify-center gap-2 mb-8 sticky top-2 z-10 bg-[#F8F5F2]/80 backdrop-blur-sm p-2 rounded-xl shadow-sm">
+        <button data-target="day1" class="nav-button active text-sm md:text-base px-4 py-2 rounded-full">1일차: 후라노</button>
+        <button data-target="day2" class="nav-button text-sm md:text-base px-4 py-2 rounded-full">2일차: 비에이 & 삿포로</button>
+        <button data-target="day3" class="nav-button text-sm md:text-base px-4 py-2 rounded-full">3일차: 삿포로 탐험</button>
+        <button data-target="day4" class="nav-button text-sm md:text-base px-4 py-2 rounded-full">4일차: 작별</button>
+        <button data-target="essentials" class="nav-button text-sm md:text-base px-4 py-2 rounded-full">핵심 정보</button>
+    </nav>
+
+    <main id="app-content">
+        <!-- Content will be generated by JavaScript -->
+        <section id="day1" class="content-section active"></section>
+        <section id="day2" class="content-section"></section>
+        <section id="day3" class="content-section"></section>
+        <section id="day4" class="content-section"></section>
+        <section id="essentials" class="content-section"></section>
+    </main>
+</div>
+
+<script>
+    const travelData = {
+        day1: {
+            title: "후라노의 대자연 속으로",
+            intro: "11시 신치토세 공항 도착 후, 렌터카 2대를 수령하여 후라노로 향합니다. 이동 중 간단히 점심을 해결하고, 아이들이 좋아할 만한 액티비티가 가득한 '시키사이노오카'에 집중하여 첫날의 피로를 덜어냅니다. 저녁에는 온천에서의 편안한 휴식이 기다립니다.",
+            events: [
+                { time: "11:00", icon: "✈️", title: "신치토세 공항 도착 및 렌터카 수령", description: "입국 수속 및 수하물 수취 후 예약한 렌터카 2대를 수령합니다. (약 1.5~2시간 소요 예상)" },
+                { time: "13:00", icon: "🚗", title: "후라노로 출발 및 점심", description: "후라노로 출발합니다(약 2.5시간 소요). 이동 중 고속도로 휴게소(SA)에서 간단하고 빠르게 점심 식사를 해결하는 것을 추천합니다." },
+                { time: "15:30", icon: "🌸", title: "시키사이노오카에서 즐거운 오후", description: "늦은 오후 도착이므로, 팜 토미타보다 아이들을 위한 액티비티(알파카 목장, 트랙터 버스)가 많은 시키사이노오카 한 곳에 집중하여 여유롭게 즐깁니다.", details: "시키사이노오카 맵코드: https://share.google/DtBPUq6XwT4eHzd1q 시간과 체력을 고려한 효율적인 선택입니다." },
+                { time: "17:30", icon: "🏨", title: "숙소 체크인 및 저녁", description: "'후라노 라 테르'에 체크인 후, 호텔 내 레스토랑에서 화정식으로 저녁 식사를 합니다. 이후 15종류의 욕조를 갖춘 천연 온천에서 피로를 풉니다.", details: "숙소 맵코드: 349 308 688*10\n저녁 식사는 사전 예약이 필수입니다. 호텔 이메일(yoyaku@f-laterre.com)로 9명 예약을 확정하세요." }
+            ]
+        },
+        day2: {
+            title: "비에이의 절경과 삿포로 입성",
+            intro: "오전에는 비현실적인 풍경의 청의 호수와 흰 수염 폭포를 둘러보고, 패치워크 로드를 드라이브합니다. 오후에는 동화 같은 닝구르 테라스를 방문한 뒤, 홋카이도의 중심 도시 삿포로로 이동하여 명물 스프카레로 저녁을 즐깁니다.",
+            events: [
+                { time: "오전", icon: "🏞️", title: "비에이 파노라마 투어", description: "신비로운 코발트블루 빛의 '청의 호수'와 '흰 수염 폭포'를 감상하고, 조각보 같은 언덕이 펼쳐진 '패치워크 로드'를 드라이브합니다.", details: "흰 수염 폭포 맵코드: 796 182 575*30 (주차 무료)\n청의 호수 맵코드: 349 568 888*11 (주차 유료)" },
+                { time: "12:30", icon: "🥖", title: "점심: 페르메 라 테레 비에이", description: "비에이의 언덕 풍경을 감상하며 현지 식재료로 만든 맛있는 점심을 즐깁니다. 레스토랑, 카페, 베이커리가 함께 있어 선택의 폭이 넓습니다.", details: "대가족에게 최적화된 장소. 사전 예약 권장. (전화: 0166-74-4417)" },
+                { time: "14:30", icon: "🌲", title: "닝구르 테라스 산책", description: "숲속 통나무집 공방들이 모여있는 낭만적인 공간을 둘러보며 아기자기한 수공예품을 구경합니다.", details: "맵코드: 919 554 432*81. 삿포로로 가기 전 마지막 코스로 완벽합니다." },
+                { time: "17:30", icon: "🏨", title: "삿포로 호텔 체크인 및 저녁", description: "'호텔 리포트 삿포로'에 체크인 후, 삿포로의 명물 '스프카레'로 저녁 식사를 합니다.", details: "추천 식당: RAMAI (비교적 넓은 매장 보유). 대가족이므로 반드시 사전 예약을 하세요." }
+            ]
+        },
+        day3: {
+            title: "삿포로 만끽하기",
+            intro: "활기찬 수산 시장에서 신선한 해산물로 아침을 시작하고, 오후에는 두 그룹으로 나뉘어 각자의 취향에 맞는 시간을 보냅니다. 저녁에는 홋카이도 대표 음식인 징기스칸으로 다 함께 만찬을 즐기고, 삿포로의 야경으로 하루를 마무리합니다.",
+            events: [
+                { time: "오전", icon: "🦀", title: "아침: 삿포로 장외시장", description: "신선한 해산물이 가득한 장외시장에서 카이센동(해산물 덮밥)이나 생선구이 정식으로 활기찬 아침을 시작합니다.", details: "니조 시장보다 규모가 크고 대형 식당이 많아 대가족 식사에 더 적합합니다. 추천 식당: 키타노 구루메테이(北のグルメ亭)." },
+                {
+                    time: "오후",
+                    icon: "🛍️",
+                    title: "오후 그룹별 활동",
+                    description: "가족들의 취향에 따라 두 그룹으로 나뉘어 삿포로역 주변에서 오후 시간을 보냅니다.",
+                    isAlternative: true,
+                    main: {
+                        title: "그룹 A: 포켓몬 센터 & 캐릭터 쇼핑",
+                        content: "아이들과 함께 삿포로 다이마루 백화점 8층에 위치한 '포켓몬 센터 삿포로'를 방문합니다. 다양한 굿즈와 이벤트를 즐길 수 있는 아이들의 천국입니다.",
+                        details: "위치: JR 삿포로역과 직결된 다이마루 백화점 내. 같은 층에 다른 캐릭터 샵(산리오, 점프샵 등)도 있어 함께 둘러보기 좋습니다."
+                    },
+                    alt: {
+                        title: "그룹 B: 삿포로역 주변 자유시간",
+                        content: "쇼핑을 즐기거나 여유로운 시간을 보내고 싶은 어른들을 위한 플랜입니다. 삿포로역은 거대한 복합 문화 공간입니다.",
+                        details: "추천 활동:\n- 다이마루, 스텔라 플레이스 등 백화점 및 쇼핑몰 구경\n- JR 타워 T38 전망대에서 삿포로 시내 조망 (유료)\n- 역 주변 카페에서 여유로운 커피 타임"
+                    }
+                },
+                { time: "18:00", icon: "🍖", title: "저녁: 삿포로 비루엔 징기스칸", description: "붉은 벽돌 건물의 이국적인 비어홀에서 홋카이도 대표 음식인 징기스칸을 맛봅니다. 무한리필 플랜은 대가족에게 합리적인 선택입니다.", details: "맵코드: 9 251 135*55. '다루마'와 달리 예약이 가능하므로, 9명 단체는 반드시 온라인/전화로 사전 예약하세요." },
+                { time: "밤", icon: "🌃", title: "야경 감상 (선택)", description: "삿포로 TV 타워에 올라 오도리 공원을 중심으로 펼쳐지는 반짝이는 도시의 야경을 감상하며 하루를 마무리합니다.", details: "입장료: 성인 약 1,000엔. 온라인 예매 시 할인 가능." }
+            ]
+        },
+        day4: {
+            title: "마지막 여운과 작별",
+            intro: "12시 10분 출국 항공편에 맞춰 분주한 아침입니다. 숙소 옆 나카지마 공원에서 마지막 홋카이도 공기를 마신 후, 서둘러 공항으로 이동하여 렌터카를 반납하고 출국 준비를 합니다.",
+            events: [
+                { time: "08:00", icon: "🌳", title: "나카지마 공원 산책 및 체크아웃", description: "이른 아침, 호텔 바로 옆 나카지마 공원에서 가벼운 산책을 즐긴 후, 서둘러 체크아웃을 준비합니다." },
+                { time: "08:30", icon: "🚗", title: "신치토세 공항으로 이동", description: "삿포로 시내에서 공항까지는 약 1시간이 소요됩니다. 교통체증을 감안하여 늦어도 8시 30분에는 출발해야 합니다." },
+                { time: "09:30", icon: "⛽", title: "렌터카 반납", description: "공항 근처 주유소에서 연료를 가득 채운 후, 각 렌터카 회사 영업소에 차량 2대를 반납합니다. 반납 절차와 셔틀 이동 시간을 고려해야 합니다." },
+                { time: "10:10", icon: "🛫", title: "탑승 수속 및 공항 즐기기", description: "국제선 항공편이므로 최소 2시간 전에는 탑승 수속을 시작해야 합니다. 남는 시간 동안 공항 내 면세점 쇼핑이나 식사를 즐깁니다.", details: "시간이 매우 촉박하므로 공항 내 테마파크 방문은 어렵습니다. 마지막 식사와 기념품 구매에 집중하는 것이 좋습니다." }
+            ]
+        },
+        essentials: {
+            title: "여행 필수 핵심 정보",
+            intro: "성공적인 홋카이도 여행을 위한 모든 필수 정보를 한곳에 모았습니다. 출발 전 체크리스트부터 예산 계획, 비상시를 대비한 연락처까지 꼼꼼하게 확인하세요.",
+            sections: [
+                {
+                    title: "출발 전 체크리스트",
+                    type: "checklist",
+                    items: [
+                        "렌터카 2대 예약 완료",
+                        "국제운전면허증 (운전자 모두)",
+                        "여행자 보험 가입",
+                        "레이어드 스타일 옷차림 준비 (방수/방풍 자켓 포함)",
+                        "주요 저녁 식당 사전 예약 (후라노 라 테르, 삿포로 비루엔 등)"
+                    ]
+                },
+                {
+                    title: "예상 경비 분석 (숙박비 제외)",
+                    type: "chart",
+                    data: {
+                        labels: ['교통 (렌트/주유/통행료)', '식사', '관광/액티비티', '기타 (간식 등)'],
+                        values: [110000, 150000, 25000, 20000]
+                    }
+                },
+                {
+                    title: "주요 연락처 및 맵코드",
+                    type: "table",
+                    headers: ["장소", "전화번호", "맵코드"],
+                    rows: [
+                        ["후라노 라 테르", "0167-39-3100", "349 308 688*10"],
+                        ["시키사이노오카", "0166-95-2758", "https://share.google/DtBPUq6XwT4eHzd1q"],
+                        ["청의 호수", "N/A", "https://share.google/nDkgKN8H7NstGYfuU"],
+                        ["닝구르 테라스", "0167-22-1111", "919 554 432*81"],
+                        ["포켓몬 센터 삿포로", "011-232-3200", "9 523 656*28"],
+                        ["삿포로 비루엔", "0120-150-550", "9 251 135*55"],
+                        ["페르메 라 테레 비에이", "0166-74-4417", "349 790 676*74"]
+                    ]
+                }
+            ]
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const contentContainer = document.getElementById('app-content');
+        const navButtons = document.querySelectorAll('.nav-button');
+
+        const renderDay = (dayData, dayIndex) => {
+            let eventsHtml = dayData.events.map((event, index) => {
+                const eventId = `day${dayIndex}-event${index}`;
+                if (event.isAlternative) {
+                    return `
+                            <div class="timeline-item relative pl-10 pb-10">
+                                <div class="timeline-dot"></div>
+                                <div class="bg-white p-4 rounded-lg shadow-md">
+                                    <p class="text-sm font-semibold text-[#C8AD_B0]">${event.time}</p>
+                                    <h3 class="text-xl font-bold mt-1 flex items-center">${event.icon} <span class="ml-2">${event.title}</span></h3>
+                                    <p class="mt-2 text-gray-600">${event.description}</p>
+                                    <div class="mt-4">
+                                        <div class="flex border-b">
+                                            <button class="alt-tab active flex-1 p-2 text-center font-semibold" data-alt-target="main${eventId}">그룹 A</button>
+                                            <button class="alt-tab flex-1 p-2 text-center font-semibold text-gray-500" data-alt-target="alt${eventId}">그룹 B</button>
+                                        </div>
+                                        <div id="main${eventId}" class="alt-content active mt-3">
+                                            <h4 class="font-bold text-lg text-[#588B8B]">${event.main.title}</h4>
+                                            <p class="text-sm mt-1">${event.main.content}</p>
+                                            <p class="mt-2 text-xs bg-teal-50 text-[#588B8B] p-2 rounded">${event.main.details}</p>
+                                        </div>
+                                        <div id="alt${eventId}" class="alt-content mt-3" style="display: none;">
+                                            <h4 class="font-bold text-lg text-[#C8AD_B0]">${event.alt.title}</h4>
+                                            <p class="text-sm mt-1">${event.alt.content}</p>
+                                            <p class="mt-2 text-xs bg-rose-50 text-[#C8AD_B0] p-2 rounded">${event.alt.details}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                }
+                return `
+                        <div class="timeline-item relative pl-10 pb-10 ${event.details ? 'cursor-pointer' : ''}" ${event.details ? `data-details-toggle="${eventId}"` : ''}>
+                            <div class="timeline-dot"></div>
+                            <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                                <p class="text-sm font-semibold text-[#C8AD_B0]">${event.time}</p>
+                                <h3 class="text-xl font-bold mt-1 flex items-center">${event.icon} <span class="ml-2">${event.title}</span></h3>
+                                <p class="mt-2 text-gray-600">${event.description}</p>
+                                ${event.details ? `
+                                <div id="details-${eventId}" class="details-content">
+                                    <div class="mt-4 pt-4 border-t border-gray-200">
+                                        <p class="text-sm whitespace-pre-wrap text-gray-800 bg-gray-50 p-3 rounded-md">${event.details}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right text-xs mt-2 text-[#588B8B] font-semibold">상세보기 ▼</div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+            }).join('');
+
+            return `
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl font-bold">${dayData.title}</h2>
+                        <p class="mt-2 max-w-2xl mx-auto">${dayData.intro}</p>
+                    </div>
+                    <div class="relative">${eventsHtml}</div>
+                `;
+        };
+
+        const renderEssentials = (essentialsData) => {
+            let sectionsHtml = essentialsData.sections.map(section => {
+                let contentHtml = '';
+                if (section.type === 'checklist') {
+                    contentHtml = `<ul class="space-y-2 mt-4">${section.items.map(item => `
+                            <li class="flex items-center">
+                                <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-[#588B8B] focus:ring-[#588B8B]">
+                                <label class="ml-3 text-gray-700">${item}</label>
+                            </li>`).join('')}</ul>`;
+                } else if (section.type === 'chart') {
+                    contentHtml = `<div class="chart-container mt-4"><canvas id="budgetChart"></canvas></div>`;
+                } else if (section.type === 'table') {
+                    contentHtml = `
+                            <div class="overflow-x-auto mt-4">
+                                <table class="min-w-full bg-white text-sm">
+                                    <thead class="bg-[#588B8B] text-white">
+                                        <tr>${section.headers.map(h => `<th class="py-2 px-4 text-left font-medium">${h}</th>`).join('')}
+                                        <th class="py-2 px-4 text-left"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        ${section.rows.map(row => `
+                                        <tr>
+                                            ${row.map(cell => `<td class="py-2 px-4">${cell}</td>`).join('')}
+                                            <td class="py-2 px-4"><button class="copy-mapcode-btn text-xs bg-[#C8AD_B0] text-white px-2 py-1 rounded-full hover:bg-[#588B8B]" data-mapcode="${row[2]}">복사</button></td>
+                                        </tr>`).join('')}
+                                    </tbody>
+                                </table>
+                            </div>`;
+                }
+                return `
+                        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                            <h3 class="text-xl font-bold">${section.title}</h3>
+                            ${contentHtml}
+                        </div>
+                    `;
+            }).join('');
+
+            return `
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl font-bold">${essentialsData.title}</h2>
+                        <p class="mt-2 max-w-2xl mx-auto">${essentialsData.intro}</p>
+                    </div>
+                    <div>${sectionsHtml}</div>
+                `;
+        };
+
+        const initChart = (chartData) => {
+            const ctx = document.getElementById('budgetChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: '예상 경비',
+                        data: chartData.values,
+                        backgroundColor: ['#588B8B', '#C8AD_B0', '#E5DDCB', '#B2A48D'],
+                        borderColor: '#F8F5F2',
+                        borderWidth: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(context.parsed);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        };
+
+        const switchTab = (targetId) => {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(targetId).classList.add('active');
+
+            navButtons.forEach(b => b.classList.remove('active'));
+            document.querySelector(`button[data-target="${targetId}"]`).classList.add('active');
+
+            if (targetId === 'essentials' && !document.getElementById('budgetChart')?.hasAttribute('data-rendered')) {
+                initChart(travelData.essentials.sections.find(s => s.type === 'chart').data);
+                if(document.getElementById('budgetChart')) document.getElementById('budgetChart').setAttribute('data-rendered', 'true');
+            }
+        };
+
+        document.getElementById('day1').innerHTML = renderDay(travelData.day1, 1);
+        document.getElementById('day2').innerHTML = renderDay(travelData.day2, 2);
+        document.getElementById('day3').innerHTML = renderDay(travelData.day3, 3);
+        document.getElementById('day4').innerHTML = renderDay(travelData.day4, 4);
+        document.getElementById('essentials').innerHTML = renderEssentials(travelData.essentials);
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => switchTab(button.dataset.target));
+        });
+
+        contentContainer.addEventListener('click', (e) => {
+            const detailsToggle = e.target.closest('[data-details-toggle]');
+            if (detailsToggle) {
+                const detailsId = 'details-' + detailsToggle.dataset.detailsToggle;
+                const detailsContent = document.getElementById(detailsId);
+                if (detailsContent) {
+                    detailsContent.classList.toggle('open');
+                }
+            }
+
+            const altTab = e.target.closest('.alt-tab');
+            if (altTab) {
+                const parent = altTab.closest('.flex.border-b').parentElement;
+                parent.querySelectorAll('.alt-tab').forEach(t => {
+                    t.classList.remove('active', 'text-[#588B8B]');
+                    t.classList.add('text-gray-500');
+                });
+
+                altTab.classList.add('active', 'text-[#588B8B]');
+                altTab.classList.remove('text-gray-500');
+
+                parent.querySelectorAll('.alt-content').forEach(c => c.style.display = 'none');
+                document.getElementById(altTab.dataset.altTarget).style.display = 'block';
+            }
+
+            const copyBtn = e.target.closest('.copy-mapcode-btn');
+            if(copyBtn) {
+                const mapcode = copyBtn.dataset.mapcode;
+                if (mapcode && mapcode !== 'N/A') {
+                    navigator.clipboard.writeText(mapcode).then(() => {
+                        copyBtn.textContent = '복사됨!';
+                        setTimeout(() => { copyBtn.textContent = '복사'; }, 2000);
+                    }).catch(err => {
+                        console.error('Failed to copy: ', err);
+                        copyBtn.textContent = '실패';
+                    });
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>
