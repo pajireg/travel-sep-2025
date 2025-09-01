@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>홋카이도 3박 4일 최종 여행 플래너</title>
+    <title>홋카이도 3박 4일 가족여행</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Hokkaido Nature -->
+    <!-- Chosen Palette: Autumn in Hokkaido -->
     <!-- Application Structure Plan: 이 앱은 사용자가 여행 일정을 직관적으로 파악할 수 있도록 날짜별 탭 인터페이스를 중심으로 설계되었습니다. '전체 개요' 탭에서는 여행의 큰 흐름과 예상 경비 분포를 시각적으로 보여주어 빠른 이해를 돕습니다. 각 날짜별 탭은 상세한 타임라인 형식으로 구성하여 시간대별 활동, 이동 정보, 식사 추천 및 유용한 팁을 체계적으로 제공합니다. 이러한 구조는 긴 텍스트 형식의 계획서보다 정보 접근성이 뛰어나고, 사용자가 특정 날짜의 정보에 집중할 수 있게 하여 대가족 여행 계획의 복잡성을 줄여줍니다. 인터랙티브 탭과 차트는 정적인 정보를 동적인 경험으로 전환하여 사용자의 참여와 이해를 극대화하기 위해 선택되었습니다. -->
     <!-- Visualization & Content Choices:
     - 전체 경로 다이어그램: Report Info -> 여행 동선 (공항-후라노-삿포로-공항). Goal -> Organize. Viz/Presentation Method -> HTML/CSS Flexbox 다이어그램. Interaction -> 없음. Justification -> 여행의 전체적인 지리적 흐름을 간단하고 명확하게 시각화. Library/Method -> Tailwind CSS.
@@ -19,12 +19,12 @@
     <style>
         body {
             font-family: 'Noto Sans KR', sans-serif;
-            background-color: #F8F7F2; /* Warm Neutral Background */
+            background-color: #FFFBF5; /* Creamy White */
         }
         .tab-active {
-            background-color: #6B8A7A; /* Muted Green */
+            background-color: #D97706; /* Amber */
             color: white;
-            border-color: #6B8A7A;
+            border-color: #D97706;
         }
         .tab-inactive {
             background-color: white;
@@ -40,30 +40,30 @@
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background-color: #A4C3A2; /* Lighter Green */
+            background-color: #FBBF24; /* Lighter Amber */
             border: 2px solid white;
         }
-        .bg-custom-beige { background-color: #F8F7F2; }
-        .bg-custom-green-light { background-color: #EBF1E8; }
-        .text-custom-green-dark { color: #506D5B; }
-        .border-custom-green { border-color: #A4C3A2; }
+        .bg-theme-base { background-color: #FFFBF5; }
+        .bg-theme-light { background-color: #FEFCE8; }
+        .text-theme-dark { color: #44403C; }
+        .border-theme-accent { border-color: #FBBF24; }
         .info-box {
             margin-top: 0.5rem;
             padding: 0.5rem;
             border-radius: 0.375rem;
             font-size: 0.875rem;
         }
-        .info-box-location { background-color: #f3e8ff; color: #6b21a8; }
-        .info-box-food { background-color: #e0f2fe; color: #0c4a6e; }
-        .info-box-flight { background-color: #fef3c7; color: #92400e; }
+        .info-box-location { background-color: #FFE4E6; color: #9F1239; }
+        .info-box-food { background-color: #FEF3C7; color: #92400E; }
+        .info-box-flight { background-color: #D1FAE5; color: #065F46; }
     </style>
 </head>
-<body class="bg-custom-beige">
+<body class="bg-theme-base">
 
 <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-5xl">
     <header class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-custom-green-dark mb-2">홋카이도 3박 4일 가족 여행</h1>
-        <p class="text-lg text-gray-600">최종 확정된 일정으로 떠나는 완벽한 여정</p>
+        <h1 class="text-4xl font-bold text-theme-dark mb-2">홋카이도 3박 4일 가족여행</h1>
+        <p class="text-lg text-gray-600">하준/하겸이네 가족여행</p>
     </header>
 
     <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-8">
@@ -78,40 +78,40 @@
         <div id="tab-content">
             <!-- Overview Content -->
             <div id="overview-content" class="tab-pane">
-                <div class="mb-8 p-6 bg-custom-green-light rounded-lg">
-                    <h3 class="text-2xl font-bold text-custom-green-dark mb-4 text-center">🗺️ 한눈에 보는 여행 경로</h3>
+                <div class="mb-8 p-6 bg-theme-light rounded-lg">
+                    <h3 class="text-2xl font-bold text-theme-dark mb-4 text-center">🗺️ 한눈에 보는 여행 경로</h3>
                     <p class="text-center text-gray-700 mb-6">이번 여행은 홋카이도의 광활한 자연을 자랑하는 후라노에서 시작하여, 활기 넘치는 대도시 삿포로를 거쳐 돌아오는 알찬 코스입니다. 렌터카로 후라노의 아름다운 풍경을 자유롭게 만끽한 후, 삿포로에서는 대중교통을 이용해 도시의 매력을 탐험합니다.</p>
                     <div class="flex items-center justify-between text-center text-xs sm:text-sm md:text-base font-semibold text-gray-700">
                         <div class="flex flex-col items-center">
                             <span class="text-2xl sm:text-3xl">✈️</span>
                             <span>신치토세 공항</span>
                         </div>
-                        <div class="flex-1 border-t-2 border-dashed border-custom-green mx-2 sm:mx-4"></div>
+                        <div class="flex-1 border-t-2 border-dashed border-theme-accent mx-2 sm:mx-4"></div>
                         <div class="flex flex-col items-center">
                             <span class="text-2xl sm:text-3xl">🚗</span>
                             <span>(렌터카)</span>
                         </div>
-                        <div class="flex-1 border-t-2 border-dashed border-custom-green mx-2 sm:mx-4"></div>
+                        <div class="flex-1 border-t-2 border-dashed border-theme-accent mx-2 sm:mx-4"></div>
                         <div class="flex flex-col items-center">
                             <span class="text-2xl sm:text-3xl">🏞️</span>
                             <span>후라노</span>
                         </div>
-                        <div class="flex-1 border-t-2 border-dashed border-custom-green mx-2 sm:mx-4"></div>
+                        <div class="flex-1 border-t-2 border-dashed border-theme-accent mx-2 sm:mx-4"></div>
                         <div class="flex flex-col items-center">
                             <span class="text-2xl sm:text-3xl">🚗</span>
                             <span>(렌터카)</span>
                         </div>
-                        <div class="flex-1 border-t-2 border-dashed border-custom-green mx-2 sm:mx-4"></div>
+                        <div class="flex-1 border-t-2 border-dashed border-theme-accent mx-2 sm:mx-4"></div>
                         <div class="flex flex-col items-center">
                             <span class="text-2xl sm:text-3xl">🏙️</span>
                             <span>삿포로</span>
                         </div>
-                        <div class="flex-1 border-t-2 border-dashed border-custom-green mx-2 sm:mx-4"></div>
+                        <div class="flex-1 border-t-2 border-dashed border-theme-accent mx-2 sm:mx-4"></div>
                         <div class="flex flex-col items-center">
                             <span class="text-2xl sm:text-3xl">🚆</span>
                             <span>(대중교통)</span>
                         </div>
-                        <div class="flex-1 border-t-2 border-dashed border-custom-green mx-2 sm:mx-4"></div>
+                        <div class="flex-1 border-t-2 border-dashed border-theme-accent mx-2 sm:mx-4"></div>
                         <div class="flex flex-col items-center">
                             <span class="text-2xl sm:text-3xl">✈️</span>
                             <span>신치토세 공항</span>
@@ -119,24 +119,24 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                    <div class="p-6 bg-custom-green-light rounded-lg">
-                        <h3 class="text-2xl font-bold text-custom-green-dark mb-4 text-center">💰 예상 경비 분포</h3>
+                    <div class="p-6 bg-theme-light rounded-lg">
+                        <h3 class="text-2xl font-bold text-theme-dark mb-4 text-center">💰 예상 경비 분포</h3>
                         <p class="text-center text-gray-700 mb-4">전체 여행 경비의 예상 분배입니다. 항공권을 제외한 현지 비용(숙박, 식비, 교통, 관광)을 기준으로 책정되었으며, 개인 쇼핑 비용에 따라 변동될 수 있습니다.</p>
                         <div class="chart-container relative h-64 md:h-80 w-full max-w-sm mx-auto">
                             <canvas id="expenseChart"></canvas>
                         </div>
                     </div>
-                    <div class="p-6 bg-custom-green-light rounded-lg">
-                        <h3 class="text-2xl font-bold text-custom-green-dark mb-4 text-center">✅ 여행 준비물 체크리스트</h3>
+                    <div class="p-6 bg-theme-light rounded-lg">
+                        <h3 class="text-2xl font-bold text-theme-dark mb-4 text-center">✅ 여행 준비물 체크리스트</h3>
                         <p class="text-center text-gray-700 mb-4">9월 홋카이도는 아침저녁으로 쌀쌀할 수 있습니다. 편안한 여행을 위해 아래 항목들을 확인해 보세요.</p>
                         <ul class="space-y-2 text-gray-800">
-                            <li class="flex items-center"><input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500 mr-3"><span>여권, 항공권, 숙소 바우처</span></li>
-                            <li class="flex items-center"><input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500 mr-3"><span>국제운전면허증, 국내면허증 (운전자)</span></li>
-                            <li class="flex items-center"><input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500 mr-3"><span>엔화 환전 및 해외결제 카드</span></li>
-                            <li class="flex items-center"><input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500 mr-3"><span>가벼운 경량 패딩 또는 바람막이</span></li>
-                            <li class="flex items-center"><input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500 mr-3"><span>편한 신발 (많이 걷게 됩니다)</span></li>
-                            <li class="flex items-center"><input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500 mr-3"><span>상비약 (소화제, 진통제 등)</span></li>
-                            <li class="flex items-center"><input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500 mr-3"><span>돼지코 어댑터 (110V) 및 보조배터리</span></li>
+                            <li class="flex items-center"><input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 mr-3"><span>여권, 항공권, 숙소 바우처</span></li>
+                            <li class="flex items-center"><input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 mr-3"><span>국제운전면허증, 국내면허증 (운전자)</span></li>
+                            <li class="flex items-center"><input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 mr-3"><span>엔화 환전 및 해외결제 카드</span></li>
+                            <li class="flex items-center"><input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 mr-3"><span>가벼운 경량 패딩 또는 바람막이</span></li>
+                            <li class="flex items-center"><input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 mr-3"><span>편한 신발 (많이 걷게 됩니다)</span></li>
+                            <li class="flex items-center"><input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 mr-3"><span>상비약 (소화제, 진통제 등)</span></li>
+                            <li class="flex items-center"><input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 mr-3"><span>돼지코 어댑터 (110V) 및 보조배터리</span></li>
                         </ul>
                     </div>
                 </div>
@@ -144,9 +144,9 @@
 
             <!-- Day 1 Content -->
             <div id="day1-content" class="tab-pane hidden">
-                <h3 class="text-2xl font-bold text-custom-green-dark mb-2">1일차 (9/11, 목): 후라노의 대자연 속으로 🏞️</h3>
+                <h3 class="text-2xl font-bold text-theme-dark mb-2">1일차 (9/11, 목): 후라노의 대자연 속으로 🏞️</h3>
                 <p class="text-gray-600 mb-6">설레는 마음으로 홋카이도 도착! 후라노의 아름다운 자연과 맛있는 음식이 우리를 기다립니다.</p>
-                <div class="relative border-l-2 border-custom-green ml-5 pl-8 space-y-8">
+                <div class="relative border-l-2 border-theme-accent ml-5 pl-8 space-y-8">
                     <div class="timeline-item">
                         <h4 class="font-bold text-lg text-gray-800">08:20 ~ 11:00 | ✈️ 홋카이도로 출발</h4>
                         <p class="text-gray-600">인천국제공항에서 신치토세공항으로 이동합니다.</p>
@@ -159,78 +159,83 @@
                     <div class="timeline-item">
                         <h4 class="font-bold text-lg text-gray-800">12:00 ~ 15:30 | 🚗 팜 토미타로 이동 및 점심</h4>
                         <p class="text-gray-600">렌터카를 타고 후라노의 팜 토미타로 이동하며, 중간에 휴게소에 들러 점심 식사를 합니다.</p>
-                        <div class="info-box info-box-food"><strong>점심 메뉴:</strong> 산채메밀소바, 사슴고기 브리또<br><strong>장소:</strong> Roadside station Shizentaikan Shimukappu</div>
+                        <div class="info-box info-box-food"><strong>점심 메뉴:</strong> 산채메밀소바, 사슴고기 브리또<br><strong>장소:</strong> <a href="https://maps.app.goo.gl/SijVr5gMEjidFidh9" target="_blank" class="text-blue-600 hover:underline">Roadside station Shizentaikan Shimukappu 🗺️</a></div>
                     </div>
                     <div class="timeline-item">
                         <h4 class="font-bold text-lg text-gray-800">15:30 ~ 16:30 | 🌸 팜 토미타 관광</h4>
                         <p class="text-gray-600">아름다운 꽃들이 만발한 팜 토미타를 둘러봅니다.</p>
-                        <div class="info-box info-box-location"><strong>장소:</strong> Farm Tomita</div>
+                        <div class="info-box info-box-location"><strong>장소:</strong> <a href="https://maps.app.goo.gl/MHjcSE5D4WKfkZBfA" target="_blank" class="text-blue-600 hover:underline">Farm Tomita 🗺️</a></div>
                     </div>
                     <div class="timeline-item">
                         <h4 class="font-bold text-lg text-gray-800">17:00 ~ | 🏨 호텔 체크인 및 휴식</h4>
                         <p class="text-gray-600">호텔에 체크인한 후 저녁 식사와 함께 온천을 즐기며 첫날의 피로를 풉니다.</p>
-                        <div class="info-box info-box-location"><strong>숙소:</strong> Furano La Terre (ふらのラテール)</div>
+                        <div class="info-box info-box-location"><strong>숙소:</strong> <a href="https://maps.app.goo.gl/eQQ4JAhw1BLBujph8" target="_blank" class="text-blue-600 hover:underline">Furano La Terre 🗺️</a></div>
                     </div>
                 </div>
             </div>
 
             <!-- Day 2 Content -->
             <div id="day2-content" class="tab-pane hidden">
-                <h3 class="text-2xl font-bold text-custom-green-dark mb-2">2일차 (9/12, 금): 비에이의 절경과 삿포로 입성 🚗</h3>
+                <h3 class="text-2xl font-bold text-theme-dark mb-2">2일차 (9/12, 금): 비에이의 절경과 삿포로 입성 🚗</h3>
                 <p class="text-gray-600 mb-6">오전에는 비에이의 신비로운 자연을 만끽하고, 오후에는 삿포로로 이동하여 맛있는 징기스칸으로 저녁을 즐깁니다.</p>
-                <div class="relative border-l-2 border-custom-green ml-5 pl-8 space-y-8">
+                <div class="relative border-l-2 border-theme-accent ml-5 pl-8 space-y-8">
                     <div class="timeline-item">
                         <h4 class="font-bold text-lg text-gray-800">09:30 ~ 10:50 | ✨ 청의 호수</h4>
                         <p class="text-gray-600">호텔에서 아침 식사 후, 신비로운 푸른 빛을 뽐내는 청의 호수로 이동하여 산책합니다.</p>
-                        <div class="info-box info-box-location"><strong>주차장:</strong> Shirogane Blue Pond Parking</div>
+                        <div class="info-box info-box-location"><strong>주차장:</strong> <a href="https://maps.app.goo.gl/PyAnBCvqQHJdfkWEA" target="_blank" class="text-blue-600 hover:underline">Shirogane Blue Pond Parking 🗺️</a></div>
                     </div>
                     <div class="timeline-item">
                         <h4 class="font-bold text-lg text-gray-800">10:50 ~ 11:30 | ✨ 흰수염 폭포</h4>
                         <p class="text-gray-600">청의 호수 근처에 있는 흰수염 폭포의 웅장한 모습을 감상합니다.</p>
-                        <div class="info-box info-box-location"><strong>주차장:</strong> Shirogane Onsen Parking</div>
+                        <div class="info-box info-box-location"><strong>주차장:</strong> <a href="https://maps.app.goo.gl/hwUjDnNJ1XDcR18K7" target="_blank" class="text-blue-600 hover:underline">Shirogane Onsen Parking 🗺️</a></div>
                     </div>
                     <div class="timeline-item">
                         <h4 class="font-bold text-lg text-gray-800">11:30 ~ 14:30 | 🌸 사계채의 언덕 및 점심</h4>
                         <p class="text-gray-600">광활한 언덕에 펼쳐진 가을 꽃밭, 사계채의 언덕을 둘러보고 그곳에서 점심 식사를 합니다.</p>
-                        <div class="info-box info-box-food"><strong>점심 메뉴:</strong> 스프카레<br><strong>장소:</strong> Flox Hall (사계채의 언덕 내)</div>
-                        <div class="info-box info-box-location"><strong>주차장:</strong> Shikisainooka Parking Lot</div>
+                        <div class="info-box info-box-food"><strong>점심 메뉴:</strong> 스프카레<br><strong>장소:</strong> <a href="https://maps.app.goo.gl/vmm4oLmFCdHrBe1B6" target="_blank" class="text-blue-600 hover:underline">Flox Hall (사계채의 언덕 내) 🗺️</a></div>
+                        <div class="info-box info-box-location"><strong>주차장:</strong> <a href="https://maps.app.goo.gl/bTfrjB2xaoAvPx5D7" target="_blank" class="text-blue-600 hover:underline">Shikisainooka Parking Lot 🗺️</a></div>
                     </div>
                     <div class="timeline-item">
                         <h4 class="font-bold text-lg text-gray-800">14:30 ~ 17:10 | 🚗 삿포로로 이동</h4>
                         <p class="text-gray-600">삿포로로 이동하며, 중간에 이와미자와 휴게소에서 잠시 휴식을 취합니다.</p>
-                        <div class="info-box info-box-location"><strong>휴게소:</strong> Iwamizawa Service Area (Westbound) for Sapporo</div>
+                        <div class="info-box info-box-location"><strong>휴게소:</strong> <a href="https://maps.app.goo.gl/xnye9QFZSJpni43d9" target="_blank" class="text-blue-600 hover:underline">Iwamizawa Service Area (Westbound) 🗺️</a></div>
                     </div>
                     <div class="timeline-item">
                         <h4 class="font-bold text-lg text-gray-800">17:10 ~ | 🏡 에어비앤비 체크인 및 렌터카 반납</h4>
                         <p class="text-gray-600">삿포로 숙소에 체크인 후, 근처 영업소에 렌터카를 반납합니다.</p>
-                        <div class="info-box info-box-location"><strong>숙소:</strong> 2-chōme-1-29 Asahimachi, Toyohira Ward, Sapporo<br><strong>렌터카 반납처:</strong> 6-1-1 Atsubetsuchuo 2 Jo, Atsubetsu Ward, Sapporo</div>
+                        <div class="info-box info-box-location">
+                            <strong>숙소:</strong> <a href="https://maps.app.goo.gl/NXAzTL9ecRGiqgqNA" target="_blank" class="text-blue-600 hover:underline">에어비엔비 🏡</a>
+                            <br>
+                            <strong>렌트카 반납처:</strong> <a href="https://maps.app.goo.gl/4tzbeKVFhvyHabC6A" target="_blank" class="text-blue-600 hover:underline">Car rental company 🚗</a>
+                        </div>
                     </div>
                     <div class="timeline-item">
                         <h4 class="font-bold text-lg text-gray-800">18:30 ~ 20:00 | 🐑 저녁 식사</h4>
                         <p class="text-gray-600">택시를 타고 이동하여 삿포로의 명물, 징기스칸 양고기 구이로 저녁을 즐깁니다.</p>
-                        <div class="info-box info-box-food"><strong>저녁 메뉴:</strong> 징기스칸 양고기<br><strong>식당:</strong> Tsukisappu Jingisukan Club</div>
+                        <div class="info-box info-box-food"><strong>저녁 메뉴:</strong> 징기스칸 양고기<br><strong>식당:</strong> <a href="https://maps.app.goo.gl/uYDvf46JZPkzL7dk6" target="_blank" class="text-blue-600 hover:underline">Tsukisappu Jingisukan Club 🗺️</a></div>
                     </div>
                 </div>
             </div>
 
             <!-- Day 3 Content -->
             <div id="day3-content" class="tab-pane hidden">
-                <h3 class="text-2xl font-bold text-custom-green-dark mb-2">3일차 (9/13, 토): 삿포로 시내 완전 정복! 🏙️</h3>
+                <h3 class="text-2xl font-bold text-theme-dark mb-2">3일차 (9/13, 토): 삿포로 시내 완전 정복! 🏙️</h3>
                 <p class="text-gray-600 mb-6">쇼핑, 역사, 미식, 그리고 환상적인 야경까지! 삿포로의 모든 것을 즐기는 하루입니다.</p>
-                <div class="relative border-l-2 border-custom-green ml-5 pl-8 space-y-8">
+                <div class="relative border-l-2 border-theme-accent ml-5 pl-8 space-y-8">
                     <div class="timeline-item">
                         <h4 class="font-bold text-lg text-gray-800">10:00 ~ 11:30 | 🛍️ 다이마루 백화점 쇼핑</h4>
                         <p class="text-gray-600">숙소에서 아침 식사 후 전철로 이동하여 다이마루 백화점에서 쇼핑을 즐깁니다. 아이들은 포켓몬센터에 방문할 수 있습니다.</p>
-                        <div class="info-box info-box-location"><strong>장소:</strong> Daimaru Sapporo</div>
+                        <div class="info-box info-box-location"><strong>장소:</strong> <a href="https://maps.app.goo.gl/ntpy6ZYQvsnPDLkdA" target="_blank" class="text-blue-600 hover:underline">Daimaru Sapporo 🗺️</a></div>
                     </div>
                     <div class="timeline-item">
                         <h4 class="font-bold text-lg text-gray-800">11:40 ~ 12:30 | 🏛️ 홋카이도청 구 본청사</h4>
                         <p class="text-gray-600">붉은 벽돌 건물이 인상적인 홋카이도청 구 본청사를 둘러보며 잠시 역사의 숨결을 느껴봅니다.</p>
+                        <div class="info-box info-box-location"><strong>장소:</strong> <a href="https://maps.app.goo.gl/Fiv5dLNeFmhbeK4v8" target="_blank" class="text-blue-600 hover:underline">홋카이도청 구 본청사 🗺️</a></div>
                     </div>
                     <div class="timeline-item">
                         <h4 class="font-bold text-lg text-gray-800">12:40 ~ 14:00 | 🦀 니조시장 구경 및 점심</h4>
                         <p class="text-gray-600">활기 넘치는 니조시장을 구경하고, 신선한 해산물로 만든 카이센동으로 점심 식사를 합니다.</p>
-                        <div class="info-box info-box-food"><strong>점심 메뉴:</strong> 카이센동 (해산물 덮밥)<br><strong>장소:</strong> Nijo Market</div>
+                        <div class="info-box info-box-food"><strong>점심 메뉴:</strong> 카이센동 (해산물 덮밥)<br><strong>장소:</strong> <a href="https://maps.app.goo.gl/jee7bZ7TC2d3znco9" target="_blank" class="text-blue-600 hover:underline">Nijo Market 🗺️</a></div>
                     </div>
                     <div class="timeline-item">
                         <h4 class="font-bold text-lg text-gray-800">14:10 ~ 16:00 | 🌳 삿포로 시내 핵심 관광</h4>
@@ -239,21 +244,21 @@
                     <div class="timeline-item">
                         <h4 class="font-bold text-lg text-gray-800">16:30 ~ 18:30 | 🌃 모이와야마 전망대</h4>
                         <p class="text-gray-600">택시로 로프웨이 입구까지 이동 후, 전망대에 올라 삿포로의 아름다운 일몰(17:49 예정)과 야경을 감상합니다.</p>
-                        <div class="info-box info-box-location"><strong>장소:</strong> 모이와산 로프웨이 산로쿠역</div>
+                        <div class="info-box info-box-location"><strong>장소:</strong> <a href="https://maps.app.goo.gl/UMRqa7Hr2r9HMD817" target="_blank" class="text-blue-600 hover:underline">모이와산 정상 (Moiwa Sancho Station) 🗺️</a></div>
                     </div>
                     <div class="timeline-item">
                         <h4 class="font-bold text-lg text-gray-800">18:45 ~ 20:00 | 🍣 저녁 식사</h4>
                         <p class="text-gray-600">전망대 근처에서 스시 또는 장어덮밥으로 맛있는 저녁 식사를 합니다.</p>
-                        <div class="info-box info-box-food"><strong>저녁 추천:</strong> UNAGI TO SAKE Machiya Grilled Eel 또는 Hokuhokutei Yamahana Branch</div>
+                        <div class="info-box info-box-food"><strong>저녁 추천:</strong> <a href="https://maps.app.goo.gl/oXqkzL97bZKgyEMH8" target="_blank" class="text-blue-600 hover:underline">UNAGI TO SAKE Machiya 🗺️</a> 또는 <a href="https://maps.app.goo.gl/8NTPyb5uiEziXUbaA" target="_blank" class="text-blue-600 hover:underline">Hokuhokutei Yamahana Branch 🗺️</a></div>
                     </div>
                 </div>
             </div>
 
             <!-- Day 4 Content -->
             <div id="day4-content" class="tab-pane hidden">
-                <h3 class="text-2xl font-bold text-custom-green-dark mb-2">4일차 (9/14, 일): 아쉬운 작별, 다음을 기약하며 👋</h3>
+                <h3 class="text-2xl font-bold text-theme-dark mb-2">4일차 (9/14, 일): 아쉬운 작별, 다음을 기약하며 👋</h3>
                 <p class="text-gray-600 mb-6">즐거웠던 홋카이도 여행을 마무리하고 한국으로 돌아가는 날입니다.</p>
-                <div class="relative border-l-2 border-custom-green ml-5 pl-8 space-y-8">
+                <div class="relative border-l-2 border-theme-accent ml-5 pl-8 space-y-8">
                     <div class="timeline-item">
                         <h4 class="font-bold text-lg text-gray-800">08:50 ~ 10:00 | 🚆 공항으로 이동</h4>
                         <p class="text-gray-600">아침 식사 후 숙소에서 체크아웃하고, 전철을 이용해 신치토세공항으로 이동합니다.</p>
@@ -264,7 +269,7 @@
                     </div>
                     <div class="timeline-item">
                         <h4 class="font-bold text-lg text-gray-800">12:10 ~ 15:10 | ✈️ 귀국</h4>
-                        <p class="text-gray-600">인천국제공항으로 향하는 비행기에 탑승합니다. 홋카이도 안녕!</p>
+                        <p class="text-gray-600">인천국제공항으로 향하는 비행기에 탑승합니다. 즐거운 여행이 되셨기를 바랍니다!</p>
                     </div>
                 </div>
             </div>
@@ -312,13 +317,13 @@
                     label: '예상 경비',
                     data: [40, 25, 20, 10, 5],
                     backgroundColor: [
-                        '#6B8A7A', // Muted Green
-                        '#A4C3A2', // Lighter Green
-                        '#D0D8B3', // Soft Beige Green
-                        '#E6CBA8', // Soft Orange
+                        '#9A3412', // Amber 800
+                        '#D97706', // Amber 600
+                        '#FBBF24', // Amber 400
+                        '#F87171', // Red 400
                         '#BDBDBD'  // Gray
                     ],
-                    borderColor: '#F8F7F2',
+                    borderColor: '#FFFBF5',
                     borderWidth: 4,
                     hoverOffset: 8
                 }]
